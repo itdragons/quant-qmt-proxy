@@ -43,13 +43,17 @@ class DataExService:
         # 先下载历史数据（确保本地有数据）                        
         if not request.disable_download:
             logger.debug("下载历史数据...")
+            n = 1
+            num = len(request.stock_list)
             for stock_code in request.stock_list:
+                print(f"当前正在下载 {request.period} {n}/{num}")
                 xtdata.download_history_data(
                     stock_code=stock_code,
                     period=request.period,
                     start_time=request.start_time,
                     end_time=request.end_time
                 )
+                n += 1
 
     def get_market_data_ex(self, request: MarketDataExRequest) -> Dict[str, Dict[str, List]]:
         """获取历史行情与实时行情（xtdata.get_market_data_ex）
