@@ -20,7 +20,7 @@ class MarketDataExRequest(BaseModel):
     start_time: str = Field(default="", description="开始时间，格式 YYYYMMDD 或 YYYYMMDDHHMMSS，空字符串表示最早可用")
     end_time: str = Field(default="", description="结束时间，格式 YYYYMMDD 或 YYYYMMDDHHMMSS，空字符串表示最新可用")
     count: int = Field(default=-1, description="数据条数，-1 表示全部数据")
-    dividend_type: str = Field(default="none", description="复权类型: none/front/back/front_ratio/back_ratio")
+    dividend_type: str = Field(default="front_ratio", description="复权类型: none/front/back/front_ratio/back_ratio")
     fill_data: bool = Field(default=True, description="是否填充缺失数据")
 
     @field_validator('stock_list')

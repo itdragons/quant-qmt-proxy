@@ -30,11 +30,12 @@ async def get_market_data_ex(
     返回 `data` 字段为各合约行情字典，key 为合约代码，value 为行情记录列表。
     """
     try:
+        request.fields = request.fields or []
         data = data_ex_service.get_market_data_ex(request)
         return MarketDataExResponse(
             data=data,
             period=request.period,
-            fields=request.fields or ["time", "open", "high", "low", "close", "volume"],
+            fields=request.fields,
         )
     except DataServiceException as e:
         raise handle_xtquant_exception(e)
