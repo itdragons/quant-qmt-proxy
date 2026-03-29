@@ -5,7 +5,7 @@ import os
 import sys
 from typing import Optional
 
-from fastapi import Depends
+from fastapi import Depends, Query
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 # 添加xtquant包到Python路径
@@ -76,15 +76,13 @@ def get_subscription_manager(settings: Settings = Depends(get_settings)):
 
 async def get_api_key(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    api_key: Optional[str] = Query(default=None),
     settings: Settings = Depends(get_settings)
 ) -> Optional[str]:
-    """获取API密钥"""
-    if not credentials:
-        return None
-    
-    # 这里可以添加API密钥验证逻辑
-    # 目前简单返回token
-    return credentials.credentials
+    """获取API密钥（支持 Authorization Bearer header 或 ?api_key= 查询参数）"""
+    if credentials:
+        return credentials.credentials
+    return api_key
 
 
 async def verify_api_key(
