@@ -8,8 +8,7 @@ from pydantic import BaseModel, Field, field_validator
 
 class MarketDataExRequest(BaseModel):
     """获取历史行情与实时行情请求（get_market_data_ex）"""
-    stock_list: List[str] = Field(..., description="合约代码列表，格式 'code.market'，如 '000001.SZ'")
-    field_list: List[str] = Field(default=[], description="字段列表，空列表返回全部字段")
+    fields: Optional[List[str]] = Field(..., description="合约代码列表，格式 'code.market'，如 '000001.SZ'")
     period: str = Field(default="1d", description=(
         "数据周期，K线: tick/1m/5m/15m/30m/1h/1d/1w；"
         "特殊周期: stoppricedata/snapshotindex/limitupperformance/"
