@@ -49,7 +49,7 @@ class DataExService:
                 try:
                     raw = xtdata.get_market_data_ex(
                         field_list=request.fields or [],
-                        stock_list=request.stock_list,
+                        stock_list=request.stock_codes,
                         period=request.period,
                         start_time=request.start_time,
                         end_time=request.end_time,
@@ -64,7 +64,7 @@ class DataExService:
                     raise DataServiceException(f"获取行情数据失败: {str(e)}")
             else:
                 # Mock 模式：返回空数据
-                return {code: [] for code in request.stock_list}
+                return {code: [] for code in request.stock_codes}
         except DataServiceException:
             raise
         except Exception as e:
