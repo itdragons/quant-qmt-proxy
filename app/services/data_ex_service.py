@@ -71,7 +71,7 @@ class DataExService:
             raise DataServiceException(f"获取行情数据失败: {str(e)}")
 
     def _format_result(self, raw: Any) -> Dict[str, Dict[str, List]]:
-        """格式化 get_market_data_ex 返回的数据（列式向量化实现）
+        """格式化 返回的数据（列式向量化实现）
 
         xtdata 返回格式: {stock_code: DataFrame(index=time, columns=fields)}
 
@@ -83,7 +83,7 @@ class DataExService:
         result: Dict[str, Dict[str, List]] = {}
 
         if not isinstance(raw, dict):
-            logger.warning(f"get_market_data_ex 返回数据格式异常: {type(raw)}")
+            logger.warning(f"返回数据格式异常: {type(raw)}")
             return result
 
         for stock_code, df in raw.items():
