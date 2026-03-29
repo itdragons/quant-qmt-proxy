@@ -172,12 +172,11 @@ async def general_exception_handler(request: Request, exc: Exception):
 
 
 # 注册路由
-app.include_router(health.router)
-app.include_router(data.router)
 app.include_router(data_ex.router)
+app.include_router(data.router)
 app.include_router(trading.router)
 app.include_router(websocket.router)
-
+app.include_router(health.router)
 
 @app.get("/")
 async def root():
