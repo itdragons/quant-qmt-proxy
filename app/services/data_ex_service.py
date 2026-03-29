@@ -53,9 +53,9 @@ class DataExService:
                         period=request.period,
                         start_time=request.start_time,
                         end_time=request.end_time,
-                        count=request.count,
-                        dividend_type=request.dividend_type,
-                        fill_data=request.fill_data,
+                        count=request.count or -1,
+                        dividend_type=request.dividend_type or 'front',
+                        fill_data=request.fill_data or True,
                     )
                     logger.debug(f"get_market_data_ex 返回类型: {type(raw)}")
                     return self._format_result(raw)
@@ -101,14 +101,13 @@ class DataExService:
                 for col in df.columns:
                     arr = df[col].to_numpy()
                     if arr.dtype.kind == 'f':
-                        # 浮点列：向量化检测 NaN，批量替换为 None
+                        # 浮点列：向量化检测 NaN
                         nan_mask = np.isnan(arr)
                         if nan_mask.any():
-                            vals = arr.tolist()  # np→Python float，C 层
-                            for i in np.nonzero(nan_mask)[0]:
-                                vals[i] = None
-                            col_data[col] = vals
+                            # arr.tolist() C 层批量转 Python float，再用 bool mask 替换 NaN 位置
+                            col_data[col] = [None if m else v for m, v in zip(nan_mask.tolist(), arr.tolist())]
                         else:
+                            # 快路径：无 NaN，zero-copy → C 层直接转 Python list
                             col_data[col] = arr.tolist()
                     else:
                         # 整型 / 对象列：直接 tolist()，无需 NaN 处理
