@@ -97,13 +97,12 @@ class DataExService:
                 for col in df.columns:
                     arr = df[col].to_numpy()
                     if arr.dtype.kind == 'f':
-                        # 浮点列：向量化检测 NaN
+                        # 浮点列：向量化检测 NaN，并 round 消除浮点精度误差
+                        arr = np.round(arr, 4)
                         nan_mask = np.isnan(arr)
                         if nan_mask.any():
-                            # arr.tolist() C 层批量转 Python float，再用 bool mask 替换 NaN 位置
                             col_data[col] = [None if m else v for m, v in zip(nan_mask.tolist(), arr.tolist())]
                         else:
-                            # 快路径：无 NaN，zero-copy → C 层直接转 Python list
                             col_data[col] = arr.tolist()
                     else:
                         # 整型 / 对象列：直接 tolist()，无需 NaN 处理
