@@ -31,7 +31,7 @@ async def get_market_data_ex(
     """
     try:
         data = data_ex_service.get_market_data_ex(request)
-        actual_fields = request.field if request.field else [
+        actual_fields = request.fields if request.fields else [
             "time", "open", "high", "low", "close", "volume", "amount"
         ]
         return MarketDataExResponse(
