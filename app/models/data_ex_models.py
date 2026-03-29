@@ -62,4 +62,4 @@ class MarketDataExResponse(BaseModel):
     """
     data: Dict[str, Dict[str, List[Any]]] = Field(..., description="各合约列式行情数据，key 为合约代码")
     period: str = Field(..., description="数据周期")
-    field_list: List[str] = Field(..., description="实际返回的字段列表")
+    fields: List[str] = Field(..., description="实际返回的字段列表")
