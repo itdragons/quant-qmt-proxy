@@ -48,7 +48,7 @@ class DataExService:
             if self._should_use_real_data():
                 try:
                     raw = xtdata.get_market_data_ex(
-                        field_list=request.fields or [],
+                        field_list=request.field_list or [],
                         stock_list=request.stock_list,
                         period=request.period,
                         start_time=request.start_time,
