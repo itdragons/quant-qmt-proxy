@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from app.config import get_settings
 from app.routers import data, health, trading, websocket
+from app.routers import data_ex
 from app.utils.exceptions import XTQuantException
 from app.utils.helpers import format_response
 from app.utils.logger import configure_logging, logger
@@ -173,6 +174,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 # 注册路由
 app.include_router(health.router)
 app.include_router(data.router)
+app.include_router(data_ex.router)
 app.include_router(trading.router)
 app.include_router(websocket.router)
 

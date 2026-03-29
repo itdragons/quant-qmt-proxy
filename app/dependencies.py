@@ -21,6 +21,7 @@ security = HTTPBearer(auto_error=False)
 
 # 全局服务实例（单例模式）
 _data_service_instance = None
+_data_ex_service_instance = None
 _trading_service_instance = None
 _subscription_manager_instance = None
 
@@ -35,6 +36,18 @@ def get_data_service(settings: Settings = Depends(get_settings)):
         _data_service_instance = DataService(settings)
     
     return _data_service_instance
+
+
+def get_data_ex_service(settings: Settings = Depends(get_settings)):
+    """获取DataExService单例实例"""
+    global _data_ex_service_instance
+
+    if _data_ex_service_instance is None:
+        from app.services.data_ex_service import DataExService
+        logger.info("初始化 DataExService...")
+        _data_ex_service_instance = DataExService(settings)
+
+    return _data_ex_service_instance
 
 
 def get_trading_service(settings: Settings = Depends(get_settings)):
