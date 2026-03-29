@@ -23,8 +23,8 @@ class MarketDataExRequest(BaseModel):
     dividend_type: str = Field(default="front_ratio", description="复权类型: none/front/back/front_ratio/back_ratio")
     fill_data: bool = Field(default=True, description="是否填充缺失数据")
 
-    @field_validator('stock_list')
-    def validate_stock_list(cls, v):
+    @field_validator('stock_codes')
+    def validate_stock_codes(cls, v):
         if not v:
             raise ValueError('合约代码列表不能为空')
         return v
