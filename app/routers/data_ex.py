@@ -31,13 +31,10 @@ async def get_market_data_ex(
     """
     try:
         data = data_ex_service.get_market_data_ex(request)
-        actual_fields = request.fields if request.fields else [
-            "time", "open", "high", "low", "close", "volume", "amount"
-        ]
         return MarketDataExResponse(
             data=data,
             period=request.period,
-            fields=actual_fields,
+            fields=request.fields or ["time", "open", "high", "low", "close", "volume"],
         )
     except DataServiceException as e:
         raise handle_xtquant_exception(e)
