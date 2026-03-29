@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, field_validator
 
 class MarketDataExRequest(BaseModel):
     """获取历史行情与实时行情请求（get_market_data_ex）"""
-    stock_codes: Optional[List[str]] = Field(..., description="合约代码列表，格式 'code.market'，如 '000001.SZ'")
+    stock_list: Optional[List[str]] = Field(..., description="合约代码列表，格式 'code.market'，如 '000001.SZ'")
     fields: Optional[List[str]] = Field(None, description="字段列表")
     period: str = Field(default="1d", description=(
         "数据周期，K线: tick/1m/5m/15m/30m/1h/1d/1w；"
@@ -23,8 +23,8 @@ class MarketDataExRequest(BaseModel):
     dividend_type: str = Field(default="front_ratio", description="复权类型: none/front/back/front_ratio/back_ratio")
     fill_data: bool = Field(default=True, description="是否填充缺失数据")
 
-    @field_validator('stock_codes')
-    def validate_stock_codes(cls, v):
+    @field_validator('stock_list')
+    def validate_stock_list(cls, v):
         if not v:
             raise ValueError('合约代码列表不能为空')
         return v
