@@ -58,7 +58,7 @@ class DataExService:
                         fill_data=request.fill_data or True,
                     )
                     logger.debug(f"get_market_data_ex 返回类型: {type(raw)}")
-                    return self._format_market_data(raw)
+                    return self._format_ex_market_data(raw)
                 except Exception as e:
                     logger.error(f"get_market_data_ex 失败: {e}")
                     raise DataServiceException(f"获取行情数据失败: {str(e)}")
@@ -70,7 +70,7 @@ class DataExService:
         except Exception as e:
             raise DataServiceException(f"获取行情数据失败: {str(e)}")
 
-    def _format_market_data(self, raw: Any) -> Dict[str, Dict[str, List]]:
+    def _format_ex_market_data(self, raw: Any) -> Dict[str, Dict[str, List]]:
         """格式化 返回的数据（列式向量化实现）
 
         xtdata 返回格式: {stock_code: DataFrame(index=time, columns=fields)}
@@ -93,19 +93,6 @@ class DataExService:
 
             try:
                 col_data: Dict[str, List] = {}
-
-                # time：索引向量化处理，毫秒时间戳转 %Y%m%d，否则直接转字符串
-                idx = df.index
-                if len(idx) > 0 and hasattr(idx, 'dtype') and np.issubdtype(idx.dtype, np.number):
-                    import pandas as pd
-                    sample = idx[0]
-                    if sample > 1_000_000_000_000:  # 毫秒时间戳
-                        col_data['time'] = pd.to_datetime(idx / 1000, unit='s').strftime('%Y%m%d').tolist()
-                    else:
-                        col_data['time'] = idx.astype(str).tolist()
-                else:
-                    col_data['time'] = idx.astype(str).tolist()
-
                 # 各数据列：按 dtype 选最优路径
                 for col in df.columns:
                     arr = df[col].to_numpy()
@@ -121,7 +108,7 @@ class DataExService:
                     else:
                         # 整型 / 对象列：直接 tolist()，无需 NaN 处理
                         col_data[col] = arr.tolist()
-
+                col_data['time'] = df.index.astype(str).tolist()
                 result[stock_code] = col_data
             except Exception as e:
                 logger.error(f"格式化 {stock_code} 数据失败: {e}")
