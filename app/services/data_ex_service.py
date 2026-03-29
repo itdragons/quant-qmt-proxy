@@ -104,8 +104,15 @@ class DataExService:
                             col_data[col] = [None if m else v for m, v in zip(nan_mask.tolist(), arr.tolist())]
                         else:
                             col_data[col] = arr.tolist()
+                    elif arr.dtype.kind == 'O':
+                        # 对象列：元素可能是 float 列表，逐元素 round
+                        def _round_item(v):
+                            if isinstance(v, (list, tuple)):
+                                return [round(x, 4) if isinstance(x, float) else x for x in v]
+                            return v
+                        col_data[col] = [_round_item(v) for v in arr.tolist()]
                     else:
-                        # 整型 / 对象列：直接 tolist()，无需 NaN 处理
+                        # 整型列：直接 tolist()
                         col_data[col] = arr.tolist()
                 col_data['time'] = df.index.astype(str).tolist()
                 result[stock_code] = col_data
