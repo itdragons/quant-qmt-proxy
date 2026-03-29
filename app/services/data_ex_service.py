@@ -46,7 +46,7 @@ class DataExService:
             n = 1
             num = len(request.stock_list)
             for stock_code in request.stock_list:
-                print(f"当前正在下载 {request.period} {n}/{num}")
+                print(f"当前正在下载 {stock_code}({request.period}) {n}/{num}")
                 xtdata.download_history_data(
                     stock_code=stock_code,
                     period=request.period,
