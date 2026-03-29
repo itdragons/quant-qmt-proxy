@@ -37,7 +37,7 @@ async def get_market_data_ex(
         return MarketDataExResponse(
             data=data,
             period=request.period,
-            field=actual_fields,
+            fields=actual_fields,
         )
     except DataServiceException as e:
         raise handle_xtquant_exception(e)
