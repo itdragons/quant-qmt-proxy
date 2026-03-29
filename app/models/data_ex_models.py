@@ -22,6 +22,7 @@ class MarketDataExRequest(BaseModel):
     count: int = Field(default=-1, description="数据条数，-1 表示全部数据")
     dividend_type: str = Field(default="front_ratio", description="复权类型: none/front/back/front_ratio/back_ratio")
     fill_data: bool = Field(default=True, description="是否填充缺失数据")
+    disable_download: bool = Field(False, description="是否禁用下载功能")
 
     @field_validator('stock_list')
     def validate_stock_list(cls, v):

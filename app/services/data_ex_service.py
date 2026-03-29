@@ -39,6 +39,18 @@ class DataExService:
     def _should_use_real_data(self) -> bool:
         return self.settings.xtquant.mode in [XTQuantMode.DEV, XTQuantMode.PROD]
 
+    def download_history_data(self, request):
+        # 先下载历史数据（确保本地有数据）                        
+        if not request.disable_download:
+            logger.debug("下载历史数据...")
+            for stock_code in request.stock_list:
+                xtdata.download_history_data(
+                    stock_code=stock_code,
+                    period=request.period,
+                    start_time=request.start_time,
+                    end_time=request.end_time
+                )
+
     def get_market_data_ex(self, request: MarketDataExRequest) -> Dict[str, Dict[str, List]]:
         """获取历史行情与实时行情（xtdata.get_market_data_ex）
 
@@ -47,6 +59,7 @@ class DataExService:
         try:
             if self._should_use_real_data():
                 try:
+                    self.download_history_data(request)
                     raw = xtdata.get_market_data_ex(
                         field_list=request.field_list or [],
                         stock_list=request.stock_list,
