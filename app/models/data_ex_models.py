@@ -10,13 +10,7 @@ class MarketDataExRequest(BaseModel):
     """获取历史行情与实时行情请求（get_market_data_ex）"""
     stock_list: Optional[List[str]] = Field(..., description="合约代码列表，格式 'code.market'，如 '000001.SZ'")
     field_list: Optional[List[str]] = Field(None, description="字段列表")
-    period: str = Field(default="1d", description=(
-        "数据周期，K线: tick/1m/5m/15m/30m/1h/1d/1w；"
-        "特殊周期: stoppricedata/snapshotindex/limitupperformance/"
-        "transactioncount1m/transactioncount1d/orderflow1m/orderflow5m/"
-        "orderflow15m/orderflow30m/orderflow1h/orderflow1d/"
-        "interactiveqa/northfinancechange1m/northfinancechange1d"
-    ))
+    period: str = Field(default="1d", description=("数据周期，K线: tick/1m/5m/15m/30m/1h/1d/1w"))
     start_time: str = Field(default="", description="开始时间，格式 YYYYMMDD 或 YYYYMMDDHHMMSS，空字符串表示最早可用")
     end_time: str = Field(default="", description="结束时间，格式 YYYYMMDD 或 YYYYMMDDHHMMSS，空字符串表示最新可用")
     count: int = Field(default=-1, description="数据条数，-1 表示全部数据")
