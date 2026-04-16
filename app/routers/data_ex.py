@@ -4,12 +4,36 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.dependencies import get_data_ex_service, verify_api_key
-from app.models.data_ex_models import MarketDataExRequest, MarketDataExResponse
+from app.models.data_ex_models import FullTickExRequest, FullTickExResponse, MarketDataExRequest, MarketDataExResponse
 from app.services.data_ex_service import DataExService
 from app.utils.exceptions import DataServiceException, handle_xtquant_exception
 from app.utils.logger import logger
 
 router = APIRouter(prefix="/api/v1/data-ex", tags=["扩展行情数据"])
+
+
+@router.post("/full-tick", response_model=FullTickExResponse)
+async def get_full_tick_ex(
+    request: FullTickExRequest,
+    api_key: str = Depends(verify_api_key),
+    data_ex_service: DataExService = Depends(get_data_ex_service),
+) -> FullTickExResponse:
+    """获取全推 tick 数据（get_full_tick）
+
+    返回各合约最新快照，列式格式，key 为合约代码。
+    多档字段（askPrice/bidPrice/askVol/bidVol）原样透传。
+    """
+    try:
+        data = data_ex_service.get_full_tick(request.stock_list)
+        return FullTickExResponse(data=data)
+    except DataServiceException as e:
+        raise handle_xtquant_exception(e)
+    except Exception as e:
+        logger.error(f"get_full_tick 接口异常: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": f"获取全推数据失败: {str(e)}"},
+        )
 
 
 @router.post("/market", response_model=MarketDataExResponse)

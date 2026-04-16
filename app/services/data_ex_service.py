@@ -26,7 +26,7 @@ except ImportError:
     xtdata = MockModule()
 
 from app.config import Settings, XTQuantMode
-from app.models.data_ex_models import MarketDataExRequest
+from app.models.data_ex_models import FullTickExRequest, MarketDataExRequest
 from app.utils.exceptions import DataServiceException
 
 
@@ -53,6 +53,53 @@ class DataExService:
                     end_time=request.end_time
                 )
                 n += 1
+
+    def get_full_tick(self, stock_list: List[str]) -> Dict[str, Dict[str, List]]:
+        """获取全推数据（xtdata.get_full_tick）
+
+        返回列式格式: {stock_code: {"time": [v], "lastPrice": [v], "askPrice": [[...]], ...}}
+        多档字段（askPrice/bidPrice/askVol/bidVol）原样包装，不拆散。
+        """
+        try:
+            if self._should_use_real_data():
+                try:
+                    raw = xtdata.get_full_tick(stock_list)
+                    logger.debug(f"get_full_tick 返回类型: {type(raw)}")
+                    return self._format_full_tick(raw)
+                except Exception as e:
+                    logger.error(f"get_full_tick 失败: {e}")
+                    raise DataServiceException(f"获取全推数据失败: {str(e)}")
+            else:
+                # Mock 模式：返回空数据
+                return {code: {} for code in stock_list}
+        except DataServiceException:
+            raise
+        except Exception as e:
+            raise DataServiceException(f"获取全推数据失败: {str(e)}")
+
+    def _format_full_tick(self, raw: Any) -> Dict[str, Dict[str, List]]:
+        """格式化 get_full_tick 原始数据为列式结构
+
+        xtdata 返回: {stock_code: {field: scalar_or_list, ...}}
+        输出列式:    {stock_code: {field: [scalar_or_list], ...}}
+        """
+        result: Dict[str, Dict[str, List]] = {}
+
+        if not isinstance(raw, dict):
+            logger.warning(f"get_full_tick 返回格式异常: {type(raw)}")
+            return result
+
+        for stock_code, tick in raw.items():
+            if not isinstance(tick, dict):
+                result[stock_code] = {}
+                continue
+            try:
+                result[stock_code] = {field: [val] for field, val in tick.items()}
+            except Exception as e:
+                logger.error(f"格式化 {stock_code} tick 数据失败: {e}")
+                result[stock_code] = {}
+
+        return result
 
     def get_market_data_ex(self, request: MarketDataExRequest) -> Dict[str, Dict[str, List]]:
         """获取历史行情与实时行情（xtdata.get_market_data_ex）

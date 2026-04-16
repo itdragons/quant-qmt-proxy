@@ -1217,7 +1217,7 @@ class DataService:
                 try:
                     # 从请求对象读取参数
                     xtdata.download_financial_data(
-                        stock_list=request.stock_list,
+                        stock_list=request.stock_list, 
                         table_list=request.table_list,
                         start_date=request.start_date if request.start_date else '',
                         end_date=request.end_date if request.end_date else ''

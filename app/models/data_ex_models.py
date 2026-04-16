@@ -40,6 +40,37 @@ class MarketDataExRequest(BaseModel):
         return v
 
 
+class FullTickExRequest(BaseModel):
+    """获取全推 tick 数据请求（get_full_tick）"""
+    stock_list: List[str] = Field(..., description="合约代码列表，格式 'code.market'，如 '000001.SZ'")
+
+    @field_validator('stock_list')
+    def validate_stock_list(cls, v):
+        if not v:
+            raise ValueError('合约代码列表不能为空')
+        return v
+
+
+class FullTickExResponse(BaseModel):
+    """获取全推 tick 数据响应（列式结构）
+
+    data 为列式格式（每字段包装为长度为 1 的列表）：
+      {
+        "000001.SZ": {
+          "time":      [1713234567000],
+          "lastPrice": [10.5],
+          "askPrice":  [[10.51, 10.52, 10.53, 10.54, 10.55]],
+          ...
+        }
+      }
+    多档字段（askPrice/bidPrice/askVol/bidVol）原样透传，不拆散。
+    客户端可用 pd.DataFrame(data["000001.SZ"]) 重建（长度为 1 的 DataFrame）。
+    """
+    data: Dict[str, Dict[str, List[Any]]] = Field(
+        ..., description="各合约列式 tick 数据，key 为合约代码"
+    )
+
+
 class MarketDataExResponse(BaseModel):
     """获取历史行情与实时行情响应（列式结构）
 
